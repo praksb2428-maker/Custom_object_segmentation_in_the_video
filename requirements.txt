@@ -1,0 +1,4 @@
+numpy>=1.24.4,<2.3
+opencv-python==4.12.0.88
+pillow>=10.0
+# PyTorch CUDA / SAM 2 are installed separately; see README.md.

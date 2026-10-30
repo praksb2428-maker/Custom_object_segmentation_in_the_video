@@ -216,3 +216,37 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific local assets and runtime files
+# Local Python environment and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local input: never upload videos, selections, or ground truth
+/input/*
+!/input/.gitkeep
+
+# Downloaded model weights
+/checkpoints/*
+!/checkpoints/.gitkeep
+*.pt
+*.pth
+*.part
+
+# Generated runtime output
+/outputs/*
+!/outputs/.gitkeep
+
+# Internal verification and third-party workspaces
+/reports/review/
+third_party/
+
+# Machine-local settings and credentials
+.env
+.env.*
+!.env.example
+*.log
+Thumbs.db
+.DS_Store
