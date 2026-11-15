@@ -89,3 +89,44 @@ def motion_support(before, after, mask, context):
     aligned = cv2.warpAffine(mask.astype(np.uint8), transform, (width, height),
                              flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT) > 0
     return aligned if aligned.any() else None
+
+
+def robust_appearance_histogram(image, mask):
+    """Smooth quantization boundaries, including the circular hue axis."""
+    histogram = appearance_histogram(image, mask)
+    if histogram is None:
+        return None
+    padded = np.concatenate([histogram[-1:], histogram, histogram[:1]], axis=0)
+    blurred = cv2.GaussianBlur(padded, (3, 3), .8, borderType=cv2.BORDER_REPLICATE)[1:-1]
+    return blurred / max(float(blurred.sum()), 1.)
+
+
+class AppearanceMemory:
+    """Anchored, bounded adaptation; color remains a heuristic, not identity proof."""
+    def __init__(self, image, mask):
+        self.initial = robust_appearance_histogram(image, mask)
+        self.recent = None if self.initial is None else self.initial.copy()
+
+    def distance(self, image, mask):
+        candidate = robust_appearance_histogram(image, mask)
+        if candidate is None or self.initial is None:
+            return None
+        return min(float(cv2.compareHist(reference, candidate, cv2.HISTCMP_BHATTACHARYYA))
+                   for reference in (self.initial, self.recent))
+
+    def matches(self, image, mask, limit=.7):
+        distance = self.distance(image, mask)
+        return distance is not None and distance <= limit
+
+    def observe(self, image, mask, *, overlap, area_ratio):
+        if self.recent is None or overlap < .55 or not .5 <= area_ratio <= 2:
+            return False
+        candidate = robust_appearance_histogram(image, mask)
+        if candidate is None:
+            return False
+        distance = float(cv2.compareHist(self.recent, candidate, cv2.HISTCMP_BHATTACHARYYA))
+        if distance > .65:
+            return False
+        self.recent = .85*self.recent + .15*candidate
+        self.recent /= max(float(self.recent.sum()), 1.)
+        return True

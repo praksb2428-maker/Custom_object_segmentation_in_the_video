@@ -102,9 +102,25 @@ def process_video(video: Path, output: Path, prompts, tracker, *, max_frames=Non
             run["segment_frames"] = tracker.segment_frames
         if hasattr(tracker, "window_frames"):
             run["window_frames"] = tracker.window_frames
-            run["max_window_frames"] = tracker.window_frames+tracker.recovery_frames
+            run["max_window_frames"] = (tracker.window_frames+tracker.recovery_frames+
+                                        (len(prompts) if getattr(tracker, "enable_reacquisition", False) else 0))
+            run["reacquisition_enabled"] = bool(getattr(tracker, "enable_reacquisition", False))
+            run["reacquired_object_ids"] = getattr(tracker, "reacquired_object_ids", [])
+            run["ever_lost_object_ids"] = getattr(tracker, "ever_lost_object_ids", [])
             run["appearance_distance_limit"] = tracker.appearance_distance_limit
-            run["appearance_reference"] = "first_accepted_frame; requires_at_least_four_pixels"
+            run["appearance_reference"] = ("initial_anchor_and_guarded_ema; requires_at_least_four_pixels"
+                                           if getattr(tracker, "adaptive_identity", False) else
+                                           "first_accepted_frame; requires_at_least_four_pixels")
+            run["adaptive_identity"] = bool(getattr(tracker, "adaptive_identity", False))
+            run["small_refinement_enabled"] = bool(getattr(tracker, "enable_small_refinement", False))
+            refiner = getattr(tracker, "small_refiner", None)
+            run["small_refinement_calls"] = getattr(refiner, "calls", 0)
+            run["small_refinement_accepted"] = getattr(refiner, "accepted", 0)
+            reference_refiner = getattr(tracker, "prompt_refiner", None)
+            run["reference_refresh_enabled"] = bool(getattr(tracker, "enable_prompt_refinement", False))
+            run["reference_refresh_calls"] = getattr(reference_refiner, "calls", 0)
+            run["reference_refresh_accepted"] = getattr(reference_refiner, "accepted", 0)
+            run["reference_refresh_applied"] = getattr(reference_refiner, "applied", 0)
         run["recovery_frames"] = tracker.recovery_frames
         run["lost_object_ids"] = tracker.lost_object_ids
         run["missing_object_ids"] = tracker.missing_object_ids

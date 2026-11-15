@@ -54,7 +54,13 @@ def parser():
     run.add_argument("--crop-size", type=positive_integer, default=256,
                      help="For --tracking-backend local: crop side in source pixels (64..2048, default 256)")
     run.add_argument("--recovery-frames", type=positive_integer, default=60,
-                     help="Consecutive missing frames before ending a small-object track (1..60, default 60)")
+                     help="Consecutive missing frames before marking a track lost (1..60, default 60)")
+    run.add_argument("--no-reacquisition", action="store_true",
+                     help="Continuous backend: stop searching after a target becomes lost")
+    run.add_argument("--no-small-refinement", action="store_true",
+                     help="Continuous backend: skip extra SAM crop inference on small accepted masks")
+    run.add_argument("--no-reference-refresh", action="store_true",
+                     help="Continuous backend: skip reference-mask resegmentation between windows")
     evaluate = commands.add_parser("evaluate", help="Compute IoU and Dice on manually labeled frames")
     evaluate.add_argument("--predictions", type=Path, required=True)
     evaluate.add_argument("--truth", type=Path, required=True)
@@ -118,7 +124,10 @@ def main(argv=None):
             else:
                 from segmentation.continuous import ContinuousTracker
                 print("Tracking backend: continuous full-frame SAM memory", flush=True)
-                tracker = ContinuousTracker(tracker, recovery_frames=args.recovery_frames)
+                tracker = ContinuousTracker(tracker, recovery_frames=args.recovery_frames,
+                                            enable_reacquisition=not args.no_reacquisition,
+                                            enable_small_refinement=not args.no_small_refinement,
+                                            enable_prompt_refinement=not args.no_reference_refresh)
         from segmentation.pipeline import process_video
         result = process_video(args.video, args.output, prompts, tracker,
                                max_frames=None if args.all_frames else args.max_frames,

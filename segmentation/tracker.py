@@ -63,3 +63,22 @@ class Sam2Tracker:
                                              for index, object_id in enumerate(ids)}
             finally:
                 self.predictor.reset_state(state)
+
+    def refine_image(self, image, prompt):
+        """Reuse the video model weights, with separate ephemeral image features."""
+        from sam2.sam2_image_predictor import SAM2ImagePredictor
+        torch = self.torch
+        precision = (torch.autocast("cuda", dtype=torch.bfloat16)
+                     if self.device == "cuda" and torch.cuda.is_bf16_supported()
+                     else nullcontext())
+        predictor = SAM2ImagePredictor(self.predictor, max_hole_area=0, max_sprinkle_area=0)
+        with torch.inference_mode(), precision:
+            try:
+                predictor.set_image(np.ascontiguousarray(image[:, :, ::-1]))
+                masks, scores, _ = predictor.predict(
+                    point_coords=(np.asarray(prompt.points, dtype=np.float32) if prompt.points else None),
+                    point_labels=(np.asarray(prompt.labels, dtype=np.int32) if prompt.points else None),
+                    box=np.asarray(prompt.box, dtype=np.float32), multimask_output=False)
+                return masks[0], float(scores[0])
+            finally:
+                predictor.reset_predictor()
