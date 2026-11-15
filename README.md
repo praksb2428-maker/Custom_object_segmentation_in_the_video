@@ -160,4 +160,6 @@ VS Code의 ▶ 버튼은 `main.py`를 열고 사용합니다. F5의 기본 실�
 ## 프로젝트 문서
 
 - [프로젝트 기획안](User-Selected%20Object%20Segmentation%20and%20Tracking%20System%20for%20Videos.md)
-- [중간보고서](mid-report-20261030-experiments.md)
+- [중간보고서 — 2026년 11월 15일 업데이트](mid-report-20261115-updated.md)
+
+중간보고서의 11월 15일 개선·비교 결과는 로컬 개선 코드로 측정했습니다. 이번 문서 갱신에는 보고서와 관련 그림·연결만 포함되며, 이 저장소의 프로그램 소스는 기존 공개 버전입니다.
