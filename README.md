@@ -186,6 +186,6 @@ VS Code의 ▶ 버튼은 `main.py`를 열고 사용합니다. F5의 기본 실�
 ## 프로젝트 문서
 
 - [프로젝트 기획안](User-Selected%20Object%20Segmentation%20and%20Tracking%20System%20for%20Videos.md)
-- [중간보고서 — 2026년 11월 16일 양식 수정](mid-report-20261115-updated.md)
+- [중간보고서 — 2026년 11월 19일 CCTV 평가 자료 준비 반영](mid-report-20261115-updated.md)
 
 현재 프로그램에는 중간보고서의 11월 15일 개선 코드가 반영되어 있습니다. 모델 가중치와 입력 영상은 별도로 준비하며, 가상환경과 실행 결과도 저장소에 포함하지 않습니다.
