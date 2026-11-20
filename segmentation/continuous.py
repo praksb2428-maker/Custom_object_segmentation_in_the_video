@@ -1,6 +1,7 @@
 """Bounded full-scene SAM memory, multi-object association and visible-only masks."""
 
 import csv
+import hashlib
 from functools import lru_cache
 from pathlib import Path
 import shutil
@@ -11,12 +12,13 @@ import numpy as np
 from .focused import prompt_center, target_regions, target_component
 from .motion import motion_support, appearance_histogram, appearance_matches, AppearanceMemory
 from .video import read_image
+from .edge import supported_edge_shrink
 
 
 class ContinuousTracker:
     tracking_mode = "continuous-full-frame"
 
-    def __init__(self, tracker, window_frames=48, recovery_frames=60, adaptive_identity=True, enable_reacquisition=False, enable_small_refinement=False, enable_prompt_refinement=False):
+    def __init__(self, tracker, window_frames=48, recovery_frames=60, adaptive_identity=True, enable_reacquisition=False, enable_small_refinement=False, enable_prompt_refinement=False, edge_partials=False):
         if type(window_frames) is not int or not 1 <= window_frames <= 60:
             raise ValueError("window_frames must be 1..60")
         if type(recovery_frames) is not int or not 1 <= recovery_frames <= 60:
@@ -28,6 +30,9 @@ class ContinuousTracker:
         self.enable_reacquisition = bool(enable_reacquisition)
         self.enable_small_refinement = bool(enable_small_refinement)
         self.small_refiner = None
+        self.edge_partials = bool(edge_partials)
+        self.edge_events = []
+        self.edge_event_count = 0
         self.enable_prompt_refinement = bool(enable_prompt_refinement)
         self.prompt_refiner = None
         for name in ("model", "device", "checkpoint"):
@@ -60,6 +65,8 @@ class ContinuousTracker:
             self.prompt_refiner = ReferenceMaskRefiner(self.tracker)
         else:
             self.prompt_refiner = None
+        self.edge_events = []
+        self.edge_event_count = 0
         previous = {}
         good_frame = {}
         peak_area = {}
@@ -173,6 +180,11 @@ class ContinuousTracker:
                                     if self.adaptive_identity and aligned is not None and good_frame[oid] == index-1:
                                         # A checked one-frame scale estimate is more relevant than an old peak.
                                         area_reference = int(aligned.sum())
+                                    historical_reference = area_reference
+                                    consecutive = old is not None and good_frame.get(oid) == index-1 and streak[oid] == 0
+                                    edge_raw = self.edge_partials and supported_edge_shrink(raw, old, consecutive=consecutive)
+                                    if edge_raw:
+                                        area_reference = int(old.sum())
                                     accepted = target_regions(raw, anchor, support,
                                                               int(old.sum()) if old is not None else None,
                                                               max_step, area_reference)
@@ -191,6 +203,13 @@ class ContinuousTracker:
                                                 accepted = candidate
                                     if self.small_refiner is not None and accepted.any():
                                         accepted = self.small_refiner.refine(read_frame(files[index]), accepted)
+                                    edge_model_sha256 = hashlib.sha256(accepted.tobytes(order="C")).hexdigest() if edge_raw else None
+                                    edge_final = edge_raw and supported_edge_shrink(accepted, old, consecutive=consecutive)
+                                    if edge_raw and not edge_final:
+                                        # A refiner cannot carry the exception to an unsupported fragment.
+                                        original_regions = target_regions(raw, anchor, support, int(old.sum()), max_step, historical_reference)
+                                        if not original_regions.any():
+                                            accepted = np.zeros_like(accepted)
                                     if accepted.any() and reference_appearance.get(oid) is not None:
                                         matches = (appearance_models[oid].matches(read_frame(files[index]), accepted,
                                                    self.appearance_distance_limit) if self.adaptive_identity else
@@ -198,7 +217,7 @@ class ContinuousTracker:
                                                                       accepted, self.appearance_distance_limit))
                                         if not matches:
                                             accepted = np.zeros_like(accepted)
-                                    if self.adaptive_identity and oid in initial_area and int(accepted.sum()) < max(1, initial_area[oid]*.1):
+                                    if self.adaptive_identity and oid in initial_area and int(accepted.sum()) < max(1, initial_area[oid]*.1) and not edge_final:
                                         accepted = np.zeros_like(accepted)
                                     if self.enable_reacquisition and streak[oid] and accepted.any():
                                         # A recovering ID must not claim a confidently visible other ID.
@@ -217,6 +236,10 @@ class ContinuousTracker:
                                                 if shared / max(1, min(int(accepted.sum()), int(rival.sum()))) > .5:
                                                     accepted = np.zeros_like(accepted)
                                                     break
+                                    if edge_raw:
+                                        self.edge_event_count += 1
+                                        if len(self.edge_events) < 512:
+                                            self.edge_events.append({"frame":index,"object_id":oid,"raw_area":raw_area,"previous_area":int(old.sum()),"historical_reference":historical_reference,"effective_reference":area_reference,"postrefine_eligible":bool(edge_final),"postrefine_model_mask_sha256":edge_model_sha256,"export_area":int(accepted.sum())})
                                     if accepted.any():
                                         state = "recovered" if streak[oid] else "tracked"
                                         if oid in self.lost_object_ids:

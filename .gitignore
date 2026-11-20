@@ -250,3 +250,11 @@ third_party/
 *.log
 Thumbs.db
 .DS_Store
+
+# Input and generated video media are local only
+*.mp4
+*.mpg
+*.mpeg
+*.avi
+*.mov
+*.mkv

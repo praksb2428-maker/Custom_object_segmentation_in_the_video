@@ -1,0 +1,4 @@
+condition,visible_observations,mean_bbox_iou,box_hits_at_iou_0_5,box_hit_rate,visible_empty_outputs,other_box_proxy
+sam2_video_three_targets,578,0.8652786550934687,575,0.9948096885813149,0,0
+detector_tracker_sam2_candidate,578,0.4888496517452964,317,0.5484429065743944,225,10
+sam2_video_middle_target_only,192,0.8273110625564278,189,0.984375,0,0

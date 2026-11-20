@@ -55,6 +55,8 @@ def parser():
                      help="For --tracking-backend local: crop side in source pixels (64..2048, default 256)")
     run.add_argument("--recovery-frames", type=positive_integer, default=60,
                      help="Consecutive missing frames before marking a track lost (1..60, default 60)")
+    run.add_argument("--edge-partials", action="store_true",
+                     help="Experimental: supported edge shrink, only with --small-objects continuous")
     run.add_argument("--no-reacquisition", action="store_true",
                      help="Continuous backend: stop searching after a target becomes lost")
     run.add_argument("--no-small-refinement", action="store_true",
@@ -82,6 +84,8 @@ def main(argv=None):
         print(f"입력 영상: {video}\n결과 폴더: {output}", flush=True)
     args = parser().parse_args(arguments)
     try:
+        if getattr(args, "edge_partials", False) and (not args.small_objects or args.tracking_backend != "continuous"):
+            raise ValueError("--edge-partials requires --small-objects --tracking-backend continuous")
         if args.command == "evaluate":
             from segmentation.evaluation import evaluate
             print(json.dumps(evaluate(args.predictions, args.truth, args.csv), indent=2))
@@ -127,7 +131,8 @@ def main(argv=None):
                 tracker = ContinuousTracker(tracker, recovery_frames=args.recovery_frames,
                                             enable_reacquisition=not args.no_reacquisition,
                                             enable_small_refinement=not args.no_small_refinement,
-                                            enable_prompt_refinement=not args.no_reference_refresh)
+                                            enable_prompt_refinement=not args.no_reference_refresh,
+                                            **({"edge_partials": True} if args.edge_partials else {}))
         from segmentation.pipeline import process_video
         result = process_video(args.video, args.output, prompts, tracker,
                                max_frames=None if args.all_frames else args.max_frames,

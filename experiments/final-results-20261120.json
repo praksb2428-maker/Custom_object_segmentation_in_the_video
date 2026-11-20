@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "experiment_date": "2026-11-20",
+  "dataset": "CAVIAR / Meet_Crowd",
+  "video_sha256": "a82c5aadaf4c33198610f341d140bbbd738844710208c7bb3fba85eb1cc570dd",
+  "video_frames": 492,
+  "fps": 25,
+  "resolution": [
+    384,
+    288
+  ],
+  "initial_frame": 160,
+  "initial_seconds": 6.4,
+  "SAM2_checkpoint_sha256": "6d1aa6f30de5c92224f8172114de081d104bbd23dd9dc5c58996f0cad5dc4d38",
+  "model": "SAM2.1 Hiera Small pretrained, unchanged weights",
+  "fine_tuning": false,
+  "metric_definition": "Fixed selected ID: bounding box of output mask versus visible official reference box, IoU>=0.5; not pixel segmentation accuracy",
+  "three_targets_pure_SAM2": {
+    "visible_object_frames": 578,
+    "mean_bbox_iou": 0.8652786550934687,
+    "fixedID_box_hits_IoU05": 575,
+    "fixedID_box_hit_rate": 0.9948096885813149,
+    "visible_empty_outputs": 0,
+    "otherbox_mismatch_proxy_NOT_IDswitches": 0,
+    "pair_overlap_pixels": 344,
+    "pair_overlap_frames": 34,
+    "post_last_visible_nonempty_frames_by_ID": {
+      "1": 2,
+      "2": 2,
+      "3": 3
+    },
+    "global_IDF1_box_metric": {
+      "GT_observations": 578,
+      "prediction_observations": 585,
+      "IDTP": 575,
+      "IDFN": 3,
+      "IDFP": 10,
+      "IDF1": 0.9888220120378332,
+      "framewise_detection_matches": 575,
+      "detection_recall_at_IoU_05": 0.9948096885813149,
+      "detection_precision_at_IoU_05": 0.9829059829059829,
+      "GT_trajectories": 3,
+      "MOT_trajectories": 3,
+      "global_assignment_EVALUATION_ONLY": [
+        {
+          "GT_id": 1,
+          "MOT_id": 1,
+          "overlap_frames": 189
+        },
+        {
+          "GT_id": 2,
+          "MOT_id": 2,
+          "overlap_frames": 170
+        },
+        {
+          "GT_id": 3,
+          "MOT_id": 3,
+          "overlap_frames": 216
+        }
+      ]
+    },
+    "by_ID": {
+      "1": {
+        "visible": 192,
+        "mean_bbox_iou": 0.8273110625564278,
+        "box_hits": 189,
+        "empty": 0,
+        "otherbox_proxy": 0
+      },
+      "2": {
+        "visible": 170,
+        "mean_bbox_iou": 0.8897118313277093,
+        "box_hits": 170,
+        "empty": 0,
+        "otherbox_proxy": 0
+      },
+      "3": {
+        "visible": 216,
+        "mean_bbox_iou": 0.8797978116087044,
+        "box_hits": 216,
+        "empty": 0,
+        "otherbox_proxy": 0
+      }
+    }
+  },
+  "three_targets_detector_tracker_SAM2_candidate": {
+    "visible_object_frames": 578,
+    "mean_bbox_iou": 0.4888496517452964,
+    "fixedID_box_hits_IoU05": 317,
+    "fixedID_box_hit_rate": 0.5484429065743944,
+    "visible_empty_outputs": 225,
+    "otherbox_mismatch_proxy_NOT_IDswitches": 10,
+    "pair_overlap_pixels": 5210,
+    "pair_overlap_frames": 54,
+    "post_last_visible_nonempty_frames_by_ID": {
+      "1": 0,
+      "2": 0,
+      "3": 0
+    },
+    "global_IDF1_box_metric": {
+      "GT_observations": 578,
+      "prediction_observations": 353,
+      "IDTP": 317,
+      "IDFN": 261,
+      "IDFP": 36,
+      "IDF1": 0.6809881847475833,
+      "framewise_detection_matches": 317,
+      "detection_recall_at_IoU_05": 0.5484429065743944,
+      "detection_precision_at_IoU_05": 0.8980169971671388,
+      "GT_trajectories": 3,
+      "MOT_trajectories": 3,
+      "global_assignment_EVALUATION_ONLY": [
+        {
+          "GT_id": 1,
+          "MOT_id": 1,
+          "overlap_frames": 115
+        },
+        {
+          "GT_id": 2,
+          "MOT_id": 2,
+          "overlap_frames": 108
+        },
+        {
+          "GT_id": 3,
+          "MOT_id": 3,
+          "overlap_frames": 94
+        }
+      ]
+    },
+    "by_ID": {
+      "1": {
+        "visible": 192,
+        "mean_bbox_iou": 0.5059242424255685,
+        "box_hits": 115,
+        "empty": 77,
+        "otherbox_proxy": 0
+      },
+      "2": {
+        "visible": 170,
+        "mean_bbox_iou": 0.5987427473278596,
+        "box_hits": 108,
+        "empty": 29,
+        "otherbox_proxy": 9
+      },
+      "3": {
+        "visible": 216,
+        "mean_bbox_iou": 0.3871823014691484,
+        "box_hits": 94,
+        "empty": 119,
+        "otherbox_proxy": 1
+      }
+    }
+  },
+  "middle_person_single_target": {
+    "visible_frames": 192,
+    "mean_bbox_iou": 0.8273110625564278,
+    "fixed_target_box_hits_IoU05": 189,
+    "fixed_target_box_hit_rate": 0.984375,
+    "visible_empty_outputs": 0,
+    "longest_visible_empty_run": 0,
+    "otherbox_mismatch_proxy_NOT_confirmed_IDswitches": 0,
+    "low_box_match_frames": [
+      {
+        "frame": 270,
+        "seconds": 10.8,
+        "area": 353,
+        "reference_visible": true,
+        "bbox_iou": 0.4876847290640394,
+        "otherbox_proxy_NOT_IDswitch": false,
+        "box_hit_IoU05": false,
+        "empty": false
+      },
+      {
+        "frame": 273,
+        "seconds": 10.92,
+        "area": 437,
+        "reference_visible": true,
+        "bbox_iou": 0.49700996677740866,
+        "otherbox_proxy_NOT_IDswitch": false,
+        "box_hit_IoU05": false,
+        "empty": false
+      },
+      {
+        "frame": 351,
+        "seconds": 14.04,
+        "area": 60,
+        "reference_visible": true,
+        "bbox_iou": 0.4918032786885246,
+        "otherbox_proxy_NOT_IDswitch": false,
+        "box_hit_IoU05": false,
+        "empty": false
+      }
+    ],
+    "last_visible_reference_frame": 351,
+    "nonempty_after_last_visible": [
+      {
+        "frame": 352,
+        "seconds": 14.08,
+        "area": 50
+      },
+      {
+        "frame": 353,
+        "seconds": 14.12,
+        "area": 30
+      }
+    ]
+  },
+  "single_vs_three_target_ID1_masks": {
+    "frames": 0,
+    "pixels": 0
+  },
+  "decision": "Project owner accepted 98.4% middle-target box match as completion criterion. Detector/tracker candidate not adopted because it worsened the fixed-input test.",
+  "scope_limits": [
+    "Only this CCTV condition supports the reported final rates",
+    "Initial boxes at6.4s were confirmed by project owner, no later frame labels used for inference",
+    "Pixel IoU/Dice unmeasured: no human approved pixel GT",
+    "Other-box mismatch is a proxy, not confirmed ID switches",
+    "Other two CAVIAR videos only passed through startup checks of the candidate; no full newpipeline validation",
+    "Single target ID1 masks identical to prior selected3 ID1; no improvement claim from reducing count"
+  ],
+  "source_evidence_sha256": {
+    "three_target_comparison": "e762a9d6b1b5f87ddd5ac3aac1a161236de5a5ed270e657e31b5d9dad0e7a61b",
+    "single_target_comparison": "88aafe71f6d178f7481e6ae36ce4079a2ae5e9d982b83127656a18aeb688d764"
+  }
+}

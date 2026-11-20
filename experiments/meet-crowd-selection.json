@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "frame_index": 160,
+  "width": 384,
+  "height": 288,
+  "video_sha256": "a82c5aadaf4c33198610f341d140bbbd738844710208c7bb3fba85eb1cc570dd",
+  "objects": [
+    {
+      "object_id": 1,
+      "box": [
+        90.0,
+        97.0,
+        122.0,
+        121.0
+      ],
+      "points": [],
+      "labels": []
+    },
+    {
+      "object_id": 2,
+      "box": [
+        108.5,
+        71.0,
+        151.5,
+        97.0
+      ],
+      "points": [],
+      "labels": []
+    },
+    {
+      "object_id": 3,
+      "box": [
+        65.5,
+        95.5,
+        94.5,
+        116.5
+      ],
+      "points": [],
+      "labels": []
+    }
+  ],
+  "note": "Initial frame boxes only, based on CAVIAR annotations and confirmed by the project owner. No future frame annotations are used by inference. Coordinates apply only to the exact source video.",
+  "source": "EC Funded CAVIAR project / IST 2001 37540, https://homepages.inf.ed.ac.uk/rbf/CAVIARDATA1/"
+}

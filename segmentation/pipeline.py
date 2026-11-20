@@ -112,6 +112,8 @@ def process_video(video: Path, output: Path, prompts, tracker, *, max_frames=Non
                                            if getattr(tracker, "adaptive_identity", False) else
                                            "first_accepted_frame; requires_at_least_four_pixels")
             run["adaptive_identity"] = bool(getattr(tracker, "adaptive_identity", False))
+            run["edge_partials_enabled"] = bool(getattr(tracker, "edge_partials", False))
+            run["edge_partials"] = {"event_count":getattr(tracker,"edge_event_count",0),"events":getattr(tracker,"edge_events",[]),"event_cap":512,"mask_source":"current SAM video/crop refiner only; no prior mask export"}
             run["small_refinement_enabled"] = bool(getattr(tracker, "enable_small_refinement", False))
             refiner = getattr(tracker, "small_refiner", None)
             run["small_refinement_calls"] = getattr(refiner, "calls", 0)
